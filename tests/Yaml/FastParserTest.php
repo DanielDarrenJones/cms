@@ -183,6 +183,19 @@ YAML;
     }
 
     #[Test]
+    public function it_remembers_a_limited_number_of_keys()
+    {
+        $yaml = implode("\n", array_map(fn ($i) => "key_$i: $i", range(1, 5000)));
+
+        $this->assertParsesTheSameAsSymfony($yaml);
+        $this->assertParsesTheSameAsSymfony($yaml);
+
+        $remembered = (new \ReflectionProperty(FastParser::class, 'keys'))->getValue();
+
+        $this->assertLessThanOrEqual(2048, count($remembered));
+    }
+
+    #[Test]
     public function it_parses_randomly_generated_values_the_same_as_symfony()
     {
         mt_srand(1);
